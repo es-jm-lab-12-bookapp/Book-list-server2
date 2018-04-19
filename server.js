@@ -35,10 +35,16 @@ app.get('/api/v1/books', (req, res) => {
     .catch(console.error);
 });
 
-app.get('/api/v1/books:id', (req, res) => {
+app.get('/api/v1/books/:id', (req, res) => {
   client.query(`
-    SELECT book_id, title, author, imague_url, isbn, description FROM books WHERE book_id = request.params.id;
-  `).then(results => res.send(results.rows)).catch(console.error);
+    SELECT * FROM books 
+    WHERE book_id = $1;`
+    ,
+    [
+      req.params.id
+    ])
+    .then(results => res.send(results.rows))
+    .catch(console.error);
 });
 
 app.post('/api/v1/books', (req, res) => {
