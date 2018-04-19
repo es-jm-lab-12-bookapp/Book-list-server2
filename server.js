@@ -18,6 +18,14 @@ client.on('error', err => console.error(err));
 
 // Application Middleware
 app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.use((req,res,next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin,X-Requested-With,content-type');
+  next();
+});
 
 // API Endpoints
 app.get('/api/v1/books', (req, res) => {
@@ -33,7 +41,9 @@ app.get('/api/v1/books:id', (req, res) => {
 });
 
 app.post('/api/v1/books', (req, res) => {
-  client.query(`INSERT INTO books (title, author, image_url, isbn, description) VALUES ($1, $2, $3, $4, $5);`,
+  client.query(`
+    INSERT INTO books (title, author, image_url, isbn, description) 
+    VALUES ($1, $2, $3, $4, $5);`,
     [
       req.body.title,
       req.body.author,
@@ -43,6 +53,7 @@ app.post('/api/v1/books', (req, res) => {
     ],
     function(err) {
       if (err) console.error(err);
+      res.send('New book yay!');
     }
   );
 });
