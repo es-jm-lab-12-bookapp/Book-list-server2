@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 // Application dependencies
 require('dotenv').config();
@@ -29,7 +29,8 @@ app.use((req,res,next) => {
 
 // API Endpoints
 app.get('/api/v1/books', (req, res) => {
-  client.query(`SELECT book_id, title, author, image_url, isbn FROM books;`)
+  client.query(`
+  SELECT book_id, title, author, image_url, isbn FROM books;`)
     .then(results => res.send(results.rows))
     .catch(console.error);
 });
