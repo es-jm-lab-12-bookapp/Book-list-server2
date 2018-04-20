@@ -38,7 +38,7 @@ app.get('/api/v1/books', (req, res) => {
 app.get('/api/v1/books/:id', (req, res) => {
   client.query(`
     SELECT * FROM books 
-    WHERE book_id = $1;`
+    WHERE book_id=$1;`
     ,
     [
       req.params.id
