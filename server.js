@@ -2,6 +2,7 @@
 
 // Application dependencies
 require('dotenv').config();
+const fs = require('fs');
 const express = require('express');
 const cors = require('cors');
 const pg = require('pg');
@@ -67,5 +68,44 @@ app.post('/api/v1/books', (req, res) => {
 
 
 
+function loadBooks() {
+  client.query(`
+    SELECT COUNT(*) FROM books;
+  `).then(result => {
+    if(!parseInt(result.rows[0].count)) {
+      fs.readFile('../book-list-client2/data/books.json', 'utf8', (err, fd) => {
+        JSON.parse(fd).forEach(element => {
+          client.query(`
+            INSERT INTO books
+            (author,title,isbn,image_url,description)
+            VALUES($1,$2,$3,$4,$5);
+        `,
+            [
+              element.author,
+              element.title,
+              element.isbn,
+              element.image_url,
+              element.description
+            ]).catch(console.error);
+        });
+      });
+    }
+  });
+}
+function loadDB() {
+  client.query(`
+    CREATE TABLE IF NOT EXISTS books(
+        book_id SERIAL PRIMARY KEY,
+        author VARCHAR(255),
+        title VARCHAR(255),
+        isbn VARCHAR(255),
+        image_url VARCHAR(255),
+        description TEXT
+    );
+  `).then(loadBooks);
+}
+
+
+loadDB();
 app.get('*', (req, res) => res.redirect(CLIENT_URL));
 app.listen(PORT, () => console.log(`Listening on port: ${PORT}`));
